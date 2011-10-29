@@ -78,10 +78,8 @@ __PACKAGE__->load_plugins(
     'Web::CSRFDefender',
 );
 
+
 builder {
-    enable 'Plack::Middleware::Static',
-        path => qr{^(?:/static/|/robot\.txt$|/favicon.ico$)},
-        root => File::Spec->catdir(dirname(__FILE__));
     enable 'Session::Cookie';
 
     __PACKAGE__->to_app();
