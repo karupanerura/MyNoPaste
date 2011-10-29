@@ -1,10 +1,6 @@
 use strict;
 use warnings;
 use utf8;
-use File::Spec;
-use File::Basename;
-use lib File::Spec->catdir(dirname(__FILE__), 'extlib', 'lib', 'perl5');
-use lib File::Spec->catdir(dirname(__FILE__), 'lib');
 use Plack::Builder;
 use Amon2::Lite;
 use Cache::File;
@@ -13,9 +9,10 @@ use Digest::MD5 qw(md5_hex);
 use Furl::HTTP;
 
 my $cache = Cache::File->new(
-    cache_root => '/tmp/NoPaste'
+    cache_root      => '/tmp/NoPaste',
+    default_expires => '7 d'
 );
-
+my $encoder = Encode::find_encoding('utf8');
 my $furl = Furl::HTTP->new(
     agent   => 'NoPaste',
     timeout => 10,
@@ -34,7 +31,7 @@ get '/' => sub {
 
 post '/' => sub {
     my $c = shift;
-    my $text = Encode::encode('utf8', $c->req->param('text'));
+    my $text = $encoder->encode($c->req->param('text'));
     my $key = md5_hex($text);
 
     $cache->set($key => $text);
@@ -60,7 +57,7 @@ get '/:key' => sub {
     my $args = shift;
     my $key = $args->{key};
 
-    my $text = Encode::decode('utf8', $cache->get($key));
+    my $text = $encoder->decode($cache->get($key));
 
     return $c->render('view.tt', +{
         text => $text
