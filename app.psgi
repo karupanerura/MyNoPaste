@@ -8,17 +8,20 @@ use Amon2::Lite;
 use Cache::File;
 use Encode;
 use Digest::MD5 qw(md5_hex);
-use Furl::HTTP;
+use AnySan::Provider::IRC;
 
 my $cache = Cache::File->new(
     cache_root      => '/tmp/NoPaste',
     default_expires => '7 d'
 );
 my $encoder = Encode::find_encoding('utf8');
-my $furl = Furl::HTTP->new(
-    agent   => 'NoPaste',
-    timeout => 10,
-);
+
+my $irc = irc
+    'localhost',
+    nickname => 'no_paste',
+    channels => {
+        '#hackathon' => {},
+    };
 
 # put your configuration here
 sub config {
@@ -44,16 +47,7 @@ post '/post' => sub {
     $cache->set($key => $text);
     my $next_url = "/post/$key";
 
-    $furl->request(
-        method     => 'POST',
-        host       => 'localhost',
-        port       => 4979,
-        path_query => '/notice',
-        content    => +{
-            channel => '#hackathon',
-            message => "NoPaste http://@{[ $c->req->env->{HTTP_HOST} ]}$next_url"
-        }
-    );
+    $irc->send_message("NoPaste http://@{[ $c->req->env->{HTTP_HOST} ]}$next_url", channel => '#hackathon');
 
     return $c->redirect($next_url);
 };
