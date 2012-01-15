@@ -29,7 +29,7 @@ sub config {
         'Text::Xslate' => +{
             syntax => 'Kolon',
             suffix => '.tx',
-            cache  => 1,
+            cache  => 0,
         },
     }
 }
@@ -134,8 +134,8 @@ __DATA__
           <div class="span4">
             <h3>Secondary content</h3>
           </div>
-: }
         </div>
+: }
       </div>
 
       <footer>
@@ -154,10 +154,12 @@ __DATA__
 : };
 : around content -> {
         <div class="row">
-          <form method="POST" action="/post">
-            <textarea name="text" id="text"></textarea>
-            <input type="submit" id="submit" value="SEND!" />
-          </form>
+          <div class="span14">
+            <form method="POST" action="/post">
+              <textarea name="text" id="text" style="width: 760px; height: 240px;"></textarea><br /><br />
+              <input type="submit" id="submit" value="SEND!" style="width: 760px; height: 80px;" />
+            </form>
+          </div>
         </div>
 : }
 
@@ -168,6 +170,8 @@ __DATA__
 : };
 : around content -> {
         <div class="row">
-          <pre><: $text :></pre>
+          <div class="span14">
+            <pre><: $text :></pre>
+          </div>
         </div>
 : }
